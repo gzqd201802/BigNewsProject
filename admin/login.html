@@ -37,6 +37,23 @@
       </form>
     </div>
   </div>
+  <!-- 从 BS 的官网复制过来的结构 -->
+  <div class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">温馨提示</h4>
+        </div>
+        <div class="modal-body">
+          <p></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
   <!-- 登录页的JS业务代码 -->
   <script>
     // 目标：登录页实现
@@ -47,6 +64,11 @@
     //    4. 不为空的情况才发送 ajax 请求
     //    5. 打印服务器返回的数据
     //    ...
+    //    成功情况处理：
+    //      1. 
+    //    失败情况处理：
+    //      1.
+    //      2. 
     // #### 1、用户登录
     // 请求地址：/admin/user/login
     // 请求方式：post
@@ -65,7 +87,12 @@
         const pwd = $('.input_pass').val().trim();
         // 3. 对用户输入的内容进行非空判断
         if( user === '' || pwd === '' ){
-          alert('老铁，不要乱来哦。');
+          // 之前的 alert 体验糟糕，换成 BS 的模态框
+          // alert('老铁，不要乱来哦。');
+          // 1. 通过 JS 调用模态框
+          $('.modal').modal();
+          // 2. 修改模态框的提示文字
+          $('.modal-body p').html('老铁，不要乱来哦。');
         }else{
           // 4. 不为空的情况才发送 ajax 请求
           $.ajax({
@@ -79,6 +106,20 @@
             dataType: "json",
             success: function (response) {
               console.log(response);
+              // 如果登录成功后端 code 返回 200
+              // 把返回的 token 通过本地存储保存起来，其他接口需要用到
+              if(response.code === 200){
+                // 1. 把 token 通过本地存储保存起来
+                localStorage.setItem('token', response.token);
+                // 2. 页面跳转到首页
+                location.href = './index.html';
+              }else{
+                // 登录失败，需要给用户提示
+                // alert(response.msg);
+                $('.modal').modal();
+                // 通过 jq 把弹窗中的文字修改了
+                $('.modal-body p').html(response.msg);
+              }
             }
           });
         }
