@@ -20,7 +20,7 @@
         <a href="#" class="logo"><img src="images/logo02.png" alt="logo"></a>
         <div class="user_info">
             <img src="images/2.jpg" alt="person">
-            <span>欢迎&nbsp;&nbsp;李思思</span>
+            <span>欢迎&nbsp;&nbsp;<strong>游客</strong></span>
             <b>管理员</b>
         </div>
         <!-- 左侧导航栏 -->
@@ -54,5 +54,52 @@
 
         </div>
     </div>
+    <script>
+    // 目标1：用户信息功能，进入首页后直接通过 ajax 发请求获取用户的信息（头像和名称）
+    // #### 2、获取用户信息
+    // 请求地址：/admin/user/info
+    // 请求方式：get
+    // 请求参数：无
+    $(function(){
+        // 目标1：用户信息功能
+        $.ajax({
+            type: "get",
+            url: "http://localhost:8080/api/v1/admin/user/info",
+            // jq 的 ajax 添加请求头
+            headers:{
+                Authorization: localStorage.getItem('token')
+            },
+            dataType: "json",
+            success: function (response) {
+                // console.log(response);
+                if( response.code === 200){
+                    // 获取用户头像
+                    const userPic = response.data.userPic;
+                    // 获取用户名称
+                    const nickname = response.data.nickname;
+                    // 设置左边用户头像，同时 设置右上角用户头像
+                    $('.user_info img , .user_center_link img').attr({
+                        src: userPic 
+                    });
+                    // 设置左边用户名称
+                    $('.user_info strong').html(nickname);
+                    // 设置右上角用户头像
+                    // $('.user_center_link img').attr({
+                    //     src: userPic 
+                    // });
+                }
+            }
+        });
+        
+        // 目标2：用户退出功能 - 删除本地存储中的 token，并跳转回登录页
+        $('.logout').click(function (e) { 
+            // 2.1 删除本地存储中的 token
+            localStorage.removeItem('token'); 
+            // 2.2 跳转回登录页
+            location.href = './login.html';        
+        });
+
+    });
+    </script>
 </body>
 </html>
