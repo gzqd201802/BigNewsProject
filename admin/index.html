@@ -83,7 +83,8 @@
         // 目标1：用户信息功能
         $.ajax({
             type: "get",
-            url: "http://localhost:8080/api/v1/admin/user/info",
+            // BigNew 是一个保存了整个项目 url 地址的对象，通过点语法获取当前请求的 url
+            url: BigNew.user_info,
             // jq 的 ajax 添加请求头，在全局 $.ajaxSetup() 中添加了，所以这里的可以删掉
             // headers:{
             //     Authorization: localStorage.getItem('token')

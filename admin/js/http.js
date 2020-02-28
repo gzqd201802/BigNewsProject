@@ -1,7 +1,8 @@
-(function(){
+(function(w){
 
+    // http.js 文件用于封装 ajax 请求时的公共代码
 
-    // 需求：在每次发送 ajax 请求前，添加请求头
+    // 需求1：在每次发送 ajax 请求前，添加请求头
     $.ajaxSetup({
         // 全局添加请求头，全局请求头不会被 $.ajax() 里的 headers 覆盖掉
         headers:{
@@ -42,5 +43,21 @@
         location.href = './login.html';
     });
 
+
+    // 需求2：把所有的 ajax 请求的 url 地址封装到一个对象中管理
+
+    // 基地址，注意这里不要写多了斜杠
+    const baseUrl = 'http://localhost:8080/api/v1';
+
+    // 拼接好的 url 放到一个对象中管理
+    const BigNew = {
+        // #### 2、获取用户信息
+        user_info: `${baseUrl}/admin/user/info`,
+        // #### 3、获取用户详情
+        user_detail: `${baseUrl}/admin/user/detail`,
+    }
+
+    // 把局部的 BigNew 添加到 window 对象上
+    w.BigNew = BigNew;
 
 })(window);
