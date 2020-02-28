@@ -145,7 +145,11 @@
         });
 
         // 目标3：点击左侧选项卡高亮
-        $('.level01').click(function (e) { 
+        $('.level01').click(function (e) {
+            // a 标签点击的时候 href 属性链接的跳转或 iframe 的加载都属于默认行为
+            // 在这个事件内部不能阻止，否则 iframe 页面打开不了 
+            // e.preventDefault();
+            
             // 一级菜单排他思想：
             //  1. 当前 $(this) 添加 active 类名，颜色变蓝
             //  2. .siblings() 兄弟慢移除 active 类名，变回默认
