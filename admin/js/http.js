@@ -1,7 +1,6 @@
 (function(w){
 
     // http.js 文件用于封装 ajax 请求时的公共代码
-
     // 需求1：在每次发送 ajax 请求前，添加请求头
     $.ajaxSetup({
         // 全局添加请求头，全局请求头不会被 $.ajax() 里的 headers 覆盖掉
@@ -9,10 +8,15 @@
             // 服务器要求添加请求头 Authorization，值为登录成功后保存到本地存储中的 token 字符串
             Authorization: localStorage.getItem('token')
         },
-
+        
         // 发送 ajax 请求前 - 作业：添加请求进度条
         beforeSend: function(){
-            // alert('ajax请求发送前触发');
+            // 显示进度条
+            // 进度条插件引入后会在 window 对象上添加一个 NProgress 成员，所以才能全局调用
+            // 如果有页面没有引入 NProgress 插件，那 window 对象上就没有 NProgress，那就不调用
+            if(window.NProgress){
+                NProgress.start();
+            }
         },
 
         // 请求成功 - success 一般不写在全局，因为会被 $.ajax() 里面的 success 覆盖掉
@@ -27,20 +31,24 @@
             // location.href = './login.html';
             $('.modal').modal();
             $('.modal p').html('数据获取失败，请重新登录');
+            // 点击去登录的按钮后跳转到登录页
+            // 请求失败才给按钮注册跳转事件。
+            $('.to-login').click(function(){
+                // 设置为登录页的路径
+                location.href = './login.html';
+            });
         },
         
         // 完成 - 不管成功失败都执行
+        // 请求完成后隐藏进度条
         complete: function(){
-            // alert('完成');
+
+            if(window.NProgress){
+                // 隐藏进度条
+                NProgress.done();
+            }
         }
 
-    });
-
-
-    // 点击去登录的按钮后跳转到登录页
-    $('.to-login').click(function(){
-        // 设置为登录页的路径
-        location.href = './login.html';
     });
 
 
@@ -73,12 +81,13 @@
         data_category:   `${baseUrl}/admin/data/category`,     // 17、各类型文章数量统计
         data_visit:      `${baseUrl}/admin/data/visit`,     // 18、日文章访问量
         // 评论接口
-        comment_list:    `${baseUrl}/admin/comment/search`,     // 19、文章评论搜索
+        comment_search:  `${baseUrl}/admin/comment/search`,     // 19、文章评论搜索
         comment_pass:    `${baseUrl}/admin/comment/pass`,       //  20、评论审核通过
         comment_reject:  `${baseUrl}/admin/comment/reject`,     // 21、评论审核不通过
         comment_delete:  `${baseUrl}/admin/comment/delete`,     // 22、删除评论
     }
 
+    // window 是实参， w 是函数的形参，保存了 window 对象的地址
     // 把局部的 BigNew 添加到 window 对象上
     w.BigNew = BigNew;
 
