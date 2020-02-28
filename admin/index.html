@@ -123,6 +123,35 @@
             location.href = './login.html';        
         });
 
+        // 目标3：点击左侧选项卡高亮
+        $('.level01').click(function (e) { 
+            // 一级菜单排他思想：
+            //  1. 当前 $(this) 添加 active 类名，颜色变蓝
+            //  2. .siblings() 兄弟慢移除 active 类名，变回默认
+            $(this).addClass('active').siblings().removeClass('active');
+            // 针对文章选项特殊处理：文章后面有二级菜单，二级菜单类名为 level02
+            // 如何实现：
+            //   1. 判断当前点击元素的下一个兄弟时候有 level02 的类名，如果有，就展开
+            if($(this).next().hasClass('level02')){
+                // alert('给我展开二级菜单');
+                // 切换显示后面的二级菜单
+                $(this).next().slideToggle();
+                // 并且把自己身上的三角小图标切换个类名旋转一下, rotate0 在样式中已经有，直接使用即可
+                $(this).find('b').toggleClass('rotate0');
+                // 让默认第一个 li 是为选中状态的黄色
+                $(this).next().find('li').eq(0).addClass('active').siblings().removeClass();
+            }else{
+                // 如果点击的菜单没有二级菜单，
+                // 就把原本展开的二级菜单的黄色选中状态去掉，告诉用户现在不在二级菜单里面了
+                $('.level02 li').removeClass('active');
+            }
+        });
+
+        // 二级菜单点击也能排他切换
+        $('.level02 li').click(function(){
+            $(this).addClass('active').siblings().removeClass('active');
+        });
+
     });
     </script>
 </body>
