@@ -54,6 +54,25 @@
 
         </div>
     </div>
+    <!-- 从 BS 的官网复制过来的结构 -->
+    <div class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">温馨提示</h4>
+            </div>
+            <div class="modal-body">
+            <p></p>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-success to-login" data-dismiss="modal">去登录</button>
+            </div>
+        </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <!-- 引入封装的外部文件 -->
+    <script src="./js/http.js"></script>
     <script>
     // 目标1：用户信息功能，进入首页后直接通过 ajax 发请求获取用户的信息（头像和名称）
     // #### 2、获取用户信息
@@ -65,10 +84,10 @@
         $.ajax({
             type: "get",
             url: "http://localhost:8080/api/v1/admin/user/info",
-            // jq 的 ajax 添加请求头
-            headers:{
-                Authorization: localStorage.getItem('token')
-            },
+            // jq 的 ajax 添加请求头，在全局 $.ajaxSetup() 中添加了，所以这里的可以删掉
+            // headers:{
+            //     Authorization: localStorage.getItem('token')
+            // },
             dataType: "json",
             success: function (response) {
                 // console.log(response);
