@@ -117,6 +117,54 @@
             });
             
 
+            // 功能2：jq 实现本地图片预览
+            //    .change()    就是表单当值改变的时候触发的事件
+            //    this         事件源，this 原生对象，$(this) 才是 JQ 对象
+            //    .files       文件列表，伪数组格式，通过索引值获取上传的一张图片
+            //    URL.createObjectURL()    把获取缓存文件的路径
+            $('#exampleInputFile').change(function(){
+                // console.dir(this);
+                const imgFile = this.files[0];
+                // 获取浏览器本地缓存中的文件的路径(特殊路径)
+                const imgUrl = URL.createObjectURL(imgFile);
+                // console.log(newUrl);
+                $('img.user_pic').attr('src', imgUrl);
+            });
+            
+
+            // 功能3：点击修改按钮，修改了用户信息
+            // 知识点：FormData
+            // FormData 可以把它看做是特殊的参数数据格式。
+            //  在 xhr1 阶段，ajax 常用于提交字符串格式数据。
+            //  在 xhr2 阶段，FormData 可用于图片上传，对象格式。
+            //  用法：new FormData(原生表单域)  可以把表单中的数据自动序列化
+            $('.btn-edit').click(function(e){
+                // 1、阻止默认行为
+                e.preventDefault();
+                
+                console.dir(this);
+                // 2、通过 FormData 把表单中的数据自动添加到 FormData 对象中，可直接用于上传
+                // this 代表当前点击的按钮
+                // PS：每个表单元素，都可以通过 this.form 获取它所在的表单域元素
+                const fd = new FormData(this.form);
+
+                // 3、通过 ajax 把新的用户信息上传到服务器
+                $.ajax({
+                    type: "post",
+                    url: BigNew.user_edit,
+                    // data 直接写 fd 对象，不要再套上个{} 了，{} 是字符串参数的传递
+                    data: fd,
+                    // 不需要要自动添加 contentType 请求头，fd 对象有自己的请求头
+                    contentType: false,
+                    // 不需要把 fd 对象转换成字符串
+                    processData: false,
+                    dataType: "json",
+                    success: function (response) {
+                       console.log(response);
+                    }
+                });
+
+            });
         });
 
     </script>
