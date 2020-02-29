@@ -68,6 +68,58 @@
             </form>
         </div>
     </div>
+    <!-- 封装了一些全局功能 -->
+    <script src="./js/http.js"></script>
+    <script>
+
+        $(function () {  
+
+            // 功能1：查询个人信息
+            // #### 3、获取用户详情
+            // 请求地址：/admin/user/detail
+            // 请求方式：get
+            // 请求参数：无
+
+            $.ajax({
+                type: "get",
+                // http.js 已经封装好了 url 地址，cv大法即可
+                url: BigNew.user_detail,
+                dataType: "json",
+                success: function (response) {
+                    console.log(response);
+                    // 从后端返回的 response 对象中获取用户信息
+                    const nickname = response.data.nickname;
+                    const email = response.data.email;
+                    const password = response.data.password;
+                    const username = response.data.username;
+                    // 把用户信息分别写入到表单的 input 标签中
+                    $('input.username').val(username);
+                    $('input.nickname').val(nickname);
+                    $('input.email').val(email);
+                    $('input.password').val(password);
+
+                    // const obj = response.data;
+                    // // for in            用于遍历对象 - 补充
+                    // // input.类名        交集选择器
+                    // for(let key in obj){
+                    //     // console.log(key);
+                    //     // key          就是对象的键名称
+                    //     // obj[key]     就是通过对象的键名称获取到值
+                    //     $(`input.${key}`).val(obj[key]);
+                    // }
+
+                    const userPic = response.data.userPic;
+                    // 图片特殊处理，需要通过 src 属性设置图片路径
+                    // img.user_pic    img 和 .user_pic 连在一起是交集选择器
+                    // 交集选择器：既要求是 img 标签，身上还要求有 .user_pic 的类名
+                    $('img.user_pic').attr('src', userPic);
+                }
+            });
+            
+
+        });
+
+    </script>
 </body>
 
 </html>

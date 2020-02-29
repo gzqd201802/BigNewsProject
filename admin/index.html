@@ -76,7 +76,8 @@
         <!-- 右侧主体内容 -->
         <div class="main" id="main_body">
             <!-- iframe 标签 name 属性的值需要和 a 标签的 target 值保持一致 -->
-            <iframe src="./main_count.html" name="main_frame" frameborder="0"></iframe>
+            <iframe src="./user.html" name="main_frame" frameborder="0"></iframe>
+            <!-- <iframe src="./main_count.html" name="main_frame" frameborder="0"></iframe> -->
         </div>
     </div>
     <!-- 从 BS 的官网复制过来的结构 -->
@@ -189,16 +190,17 @@
             //   .siblings()  兄弟元素
             $(this).parent().prev().addClass('active').siblings().removeClass('active');
         });
-
+        
 
         // 需求修复1：左上角个人中心点击，左侧菜单中的个人中心高亮
+        // 这里点击 a 标签的时候打开了个人中心页，但是左侧的菜单没有对应高亮，把高亮的指示补充上去。
         $('.user_center_link a').eq(0).click(function () {
             // 左侧个人中心高亮
             $('#user').addClass('active').siblings().removeClass('active');
             // 所有二级菜单的颜色去掉
             $('.level02 li').removeClass('active');
         });
-        
+
     });
     </script>
 </body>
