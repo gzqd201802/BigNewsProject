@@ -43,12 +43,18 @@
                 <div class="form-group">
                     <label for="inputPassword3" class="col-sm-2 control-label">用户图标：</label>
                     <div class="col-sm-10">
-                        <img src="images/2.jpg" alt="" class="user_pic">
-                        <input style="display: block" name="userPic" type="file" id="exampleInputFile">
-                        <!-- 给label标签的for属性赋值,值是input标签的id,那这样的话点击label就相当于点击了input -->
-                        <br>
+                        <!-- .user_pic 是我们的用户头像 -->
+                        <!-- 需求：点击用户头像就直接能触发上传按钮 -->
                         <label for="exampleInputFile">
+                            <img src="images/2.jpg" alt="" class="user_pic">
+                        </label>
+                        <!-- input: file 文件上传按钮不能删除，只是通过演示隐藏了起来 -->
+                        <input style="display: none" name="userPic" type="file" id="exampleInputFile">
+                        <!-- 给label标签的for属性赋值,值是input标签的id,那这样的话点击label就相当于点击了input -->
+                        <label for="exampleInputFile">
+                            <!-- 如某些网站上会给上传按钮做成更漂亮的图标，外面需要套一个 label 即可 -->
                             <img src="./images/uploads_icon.jpg" style="height: 50px;" alt="">
+                            点击更换头像
                         </label>
                     </div>
                 </div>
@@ -117,17 +123,19 @@
             });
             
 
-            // 功能2：jq 实现本地图片预览
+            // 功能2：jq 实现本地图片预览 - 还没有上传，只是本地查看而已
             //    .change()    就是表单当值改变的时候触发的事件
             //    this         事件源，this 原生对象，$(this) 才是 JQ 对象
             //    .files       文件列表，伪数组格式，通过索引值获取上传的一张图片
             //    URL.createObjectURL()    把获取缓存文件的路径
             $('#exampleInputFile').change(function(){
                 // console.dir(this);
+                // 在上传按钮中获取到上传的文件对象
                 const imgFile = this.files[0];
                 // 获取浏览器本地缓存中的文件的路径(特殊路径)
                 const imgUrl = URL.createObjectURL(imgFile);
                 // console.log(newUrl);
+                // 把路径设置到图片中就可实现预览
                 $('img.user_pic').attr('src', imgUrl);
             });
             
@@ -152,7 +160,7 @@
                 $.ajax({
                     type: "post",
                     url: BigNew.user_edit,
-                    // data 直接写 fd 对象，不要再套上个{} 了，{} 是字符串参数的传递
+                    // data 直接写 fd 对象，不要再套上个{}了，{} 是字符串参数的传递
                     data: fd,
                     // 不需要要自动添加 contentType 请求头，fd 对象有自己的请求头
                     contentType: false,
@@ -160,11 +168,28 @@
                     processData: false,
                     dataType: "json",
                     success: function (response) {
-                       console.log(response);
+                    //  知识点：
+                    //    iframe 中的页面，window 对象是指 iframe 页面中的 window 对象
+                    //    如果想要获取到 iframe 的父级页面，可以通过 window.parent
+                    //    window.parent 要通过 http 协议方式才能正常获取父页面
+                        if(response.code === 200){
+                            //  方案1：刷新父级页面 - 体验不好
+                            // window.parent.location.reload();
+
+                            //  方案2：通过 window.parent.$() 选中父级页面元素并修改
+                            // 获取当前 iframe 中的预览图，和 input.nickname 的值
+                            const imgSrc = $('img.user_pic').attr('src');
+                            const nickname = $('input.nickname').val();
+                            // 修改父级页面中的图片
+                            // window.parent.$() 操作的就是父级页面的元素
+                            window.parent.$('.user_info img,.user_center_link img').attr('src', imgSrc );
+                            window.parent.$('.user_info strong').html(nickname);
+                        }
                     }
                 });
 
             });
+        
         });
 
     </script>
