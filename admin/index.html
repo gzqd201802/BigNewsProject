@@ -164,7 +164,13 @@
                 // 并且把自己身上的三角小图标切换个类名旋转一下, rotate0 在样式中已经有，直接使用即可
                 $(this).find('b').toggleClass('rotate0');
                 // 让默认第一个 li 是为选中状态的黄色
-                $(this).next().find('li').eq(0).addClass('active').siblings().removeClass();
+                // $(this).next().find('li').eq(0).addClass('active').siblings().removeClass();
+                // 需求修复3：默认点击第一个 li 里面的 a 标签，并触发默认行为。
+                // 补充：
+                // JQ  对象的 click()   - 触发点击事件
+                // DOM 对象的 click()   - 触发点击事件 + 触发默认行为
+                // [0]  就是把 jq 对象转换成 dom 对象，用于触发 a 点击在 iframe 打开页面的默认行为
+                $(this).next().find('li').eq(0).children('a')[0].click();
             }else{
                 // 如果点击的菜单没有二级菜单，
                 // 就把原本展开的二级菜单的黄色选中状态去掉，告诉用户现在不在二级菜单里面了
@@ -172,11 +178,27 @@
             }
         });
 
-        // 二级菜单点击也能排他切换
         $('.level02 li').click(function(){
+            // 二级菜单点击也能排他切换
             $(this).addClass('active').siblings().removeClass('active');
+            // 需求修复2：二级菜单点击时，对应的一级菜单高亮
+            // 知识点：
+            //   $(this)      当前元素
+            //   .parent()    父级元素
+            //   .prev()      前一个元素
+            //   .siblings()  兄弟元素
+            $(this).parent().prev().addClass('active').siblings().removeClass('active');
         });
 
+
+        // 需求修复1：左上角个人中心点击，左侧菜单中的个人中心高亮
+        $('.user_center_link a').eq(0).click(function () {
+            // 左侧个人中心高亮
+            $('#user').addClass('active').siblings().removeClass('active');
+            // 所有二级菜单的颜色去掉
+            $('.level02 li').removeClass('active');
+        });
+        
     });
     </script>
 </body>
