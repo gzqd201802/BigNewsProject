@@ -43,14 +43,46 @@
                 <tfoot>
                     <tr>
                         <td colspan="3" class="text-center">
-                            <a href="javascript:void(0)" class="btn btn-success" id="xinzengfenlei" data-toggle="modal"
-                                data-target="#myModal">新增分类</a>
+                            <a href="#" class="btn btn-success" id="xinzengfenlei">新增分类</a>
                         </td>
                     </tr>
                 </tfoot>
             </table>
         </div>
     </div>
+    <!-- CV大法把模态框准备好，默认是隐藏 -->
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">文章分类操作</h4>
+                </div>
+                <div class="modal-body">
+                    <!-- 表单结构放到模态框主体中 modal-body -->
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">分类名称</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="inputEmail3" placeholder="名称">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputPassword3" class="col-sm-2 control-label">分类别名</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="inputPassword3" placeholder="别名">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary">分类</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
     <!-- 引入核心封装的文件 -->
     <script src="./js/http.js"></script>
     <!-- // 1 头部已经导入模板引擎 -->
@@ -91,7 +123,59 @@
             }
 
             // 调用：页面加载的时候先获取一次数据并渲染
+            // 目标1：分类数据获取
             getListRender();
+
+
+            // 目标2：分类数据新增
+            // 给新增分类按钮绑定点击事件
+            $('#xinzengfenlei').click(function(){
+                // 显示模态框
+                $('#myModal').modal();
+                const str = $(this).text().trim();
+                // 通过 eq(1) 找到第二个按钮
+                $('.modal-footer button').eq(1)
+                // .text() 修改按钮的文本
+                .text(str)
+                // .attr() 把原本按钮的类名覆盖掉，变绿色
+                // .addClass()  这里不要添加类名，会受到样式层叠的影响
+                .attr('class','btn btn-success');
+            });
+
+
+            // 需求：隐藏模态框的时候，就清空掉表单数据，方便下一次操作
+            $('#myModal').on('hide.bs.modal', function (e) {
+                // $('form')[0]    把 JQ 对象转换成原生对象
+                // .reset()        清空表单内容(DOM 表单的方法，原生的)
+                $('form')[0].reset();
+            });
+
+            // 模态框第二个按钮绑定事件
+            $('.modal-footer button').eq(1).click(function(){
+                // 功能1：新增文章操作
+
+                $.ajax({
+                    type: "post",
+                    // 从 http.js 中获取链接
+                    url: BigNew.category_add,
+                    data: {
+                        name: $('form input').eq(0).val().trim(),
+                        slug: $('form input').eq(1).val().trim(),
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        // console.log(response);
+                        // 如果新增成功， code 值是 201
+                        if(response.code === 201){
+                            // 隐藏模态框
+                            $('#myModal').modal('hide');
+                            // 调用之前封装好的方法，重新获取分类列表并渲染
+                            getListRender();
+                        }
+                    }
+                });
+                // 功能2：编辑文章的操作也写这里
+            });
             
         });
     </script>
