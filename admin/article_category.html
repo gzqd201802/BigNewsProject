@@ -214,10 +214,13 @@
                     $.ajax({
                         type: "post",
                         url: BigNew.category_edit,
-                        // 如何获取到正确的参数
+                        // 注意获取到正确的参数
                         data: {
+                            // name: form 表单的第一个 input 的值
                             name: $('form input').eq(0).val().trim(),
+                            // name: form 表单的第二个 input 的值
                             slug: $('form input').eq(1).val().trim(),
+                            // id: 编辑按钮上的 data-id 自定义属性的值
                             id: $('.modal-footer button').eq(1).attr('data-id'),
                         },
                         dataType: "json",
@@ -235,6 +238,31 @@
                 }
             });
             
+
+            // 目标4：分类数据删除
+            // 由于删除按钮也是动态生成的,所以需要用事件委托方式绑定事件
+            $('table').on('click','.btn-danger',function(){
+                // 1. 获取当前点击的删除按钮上的 data-id 的值（用于ajax实现删除的）
+                const id = $(this).attr('data-id');
+                // alert(id);
+                // 2. 通过 ajax 发送请求，在数据库中删除分类数据
+                $.ajax({
+                    type: "post",
+                    url: BigNew.category_delete,
+                    data: {
+                        id: id
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        // console.log(response);
+                        if(response.code === 204){
+                            // 3. 重新获取分类数据并渲染(目标1的时候已经封装好了，调用即可)
+                            getListRender();
+                            alert(response.msg);
+                        }
+                    }
+                });
+            });
 
 
         });
