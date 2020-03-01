@@ -150,33 +150,93 @@
                 $('form')[0].reset();
             });
 
-            // 模态框第二个按钮绑定事件
-            $('.modal-footer button').eq(1).click(function(){
-                // 功能1：新增文章操作
+            
+            // 目标3：分类数据修改(编辑)
+            //  3.1 通过事件委托实现编辑按钮的事件绑定
+            // jq 事件委托的写法：
+            // $('父级元素选择器').on('事件类型','子元素选择器',function(){ });
+            $('table').on('click','.btn-info',function(){
+                // 获取当前点击按钮上的自定义属性 data-id
+                const id = $(this).attr('data-id');
+                // alert(id);
+                // 1. 弹出模态框
+                $('#myModal').modal();
+                // 2. 把模态框中的提交按钮文字改成<编辑>并改变<颜色>
+                $('.modal-footer button').eq(1)
+                // 改变按钮<文字>
+                .text('编辑')
+                // 改变按钮<颜色>
+                .attr('class','btn btn-info')
+                // 3. !!! 把原编辑按钮的 id 以自定义属性方式添加到模态框的编辑按钮上。(修改那个数据)
+                .attr('data-id', id);
+                // 4. 把数据编辑按钮所在 tr 的数据填充到表单中输入框中
+                // tr 的第一个孩子是 name 的值
+                const name = $(this).parents('tr').children().eq(0).text().trim();
+                // tr 的第二个孩子是 slug 的值
+                const slug = $(this).parents('tr').children().eq(1).text().trim();
+                
+                // 把编辑按钮对应的分类数据的值，填充到输入框里面
+                $('form input').eq(0).val(name);
+                $('form input').eq(1).val(slug);
+            });
 
-                $.ajax({
-                    type: "post",
-                    // 从 http.js 中获取链接
-                    url: BigNew.category_add,
-                    data: {
-                        name: $('form input').eq(0).val().trim(),
-                        slug: $('form input').eq(1).val().trim(),
-                    },
-                    dataType: "json",
-                    success: function (response) {
-                        // console.log(response);
-                        // 如果新增成功， code 值是 201
-                        if(response.code === 201){
-                            // 隐藏模态框
-                            $('#myModal').modal('hide');
-                            // 调用之前封装好的方法，重新获取分类列表并渲染
-                            getListRender();
+            // 模态框第二个按钮绑定事件。
+            //   内部需要分支实现两个功能：
+            //      功能1：新增文章分类操作
+            //      功能2：编辑文章分类操作
+            $('.modal-footer button').eq(1).click(function(){
+                // 功能1：新增文章分类操作
+                if($(this).text().trim() === '新增分类'){
+                    $.ajax({
+                        type: "post",
+                        // 从 http.js 中获取链接
+                        url: BigNew.category_add,
+                        data: {
+                            // 获取表单中的两个 input 输入框的值作为参数
+                            name: $('form input').eq(0).val().trim(),
+                            slug: $('form input').eq(1).val().trim(),
+                        },
+                        dataType: "json",
+                        success: function (response) {
+                            // console.log(response);
+                            // 如果新增成功， code 值是 201
+                            if(response.code === 201){
+                                // 隐藏模态框
+                                $('#myModal').modal('hide');
+                                // 调用之前封装好的方法，重新获取分类列表并渲染
+                                getListRender();
+                            }
                         }
-                    }
-                });
-                // 功能2：编辑文章的操作也写这里
+                    });
+                }
+                // 功能2：编辑分类的操作也写这里
+                else{
+                    $.ajax({
+                        type: "post",
+                        url: BigNew.category_edit,
+                        // 如何获取到正确的参数
+                        data: {
+                            name: $('form input').eq(0).val().trim(),
+                            slug: $('form input').eq(1).val().trim(),
+                            id: $('.modal-footer button').eq(1).attr('data-id'),
+                        },
+                        dataType: "json",
+                        success: function (response) {
+                            console.log(response);
+                            // 如果修改成功 code 的值是 200
+                            if(response.code === 200){
+                                // 隐藏模态框
+                                $('#myModal').modal('hide');
+                                // 文章分类数据重新渲染
+                                getListRender();
+                            }
+                        }
+                    });
+                }
             });
             
+
+
         });
     </script>
 </html>
