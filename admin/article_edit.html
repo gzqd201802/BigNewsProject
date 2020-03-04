@@ -244,7 +244,7 @@
                         if(response.code === 200){
                             alert('成功');
                             // 后退回到列表页，因为编辑页面是从列表页跳转过来的。
-                            // history.back(); - 页面不会刷新，有问题
+                            // history.back(); - 页面不会刷新，从缓存中读取，页面不会发新的 ajax 请求有问题
                             
                             // 还是用跳转的方式，重新请求到新的数据
                             location.href = './article_list.html';
