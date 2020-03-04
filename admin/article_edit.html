@@ -122,11 +122,11 @@
             //   [1]               取出数组索引值为 1 的项
             const articleId = Number(location.search.split('=')[1]);
 
-            // 防止文章编辑页直接打开了，没有 id 参数，就直接跳转到首页
-            if(articleId === undefined){
-                alert('没有id参数，跳转到首页');
-                // 直接跳转回到首页
-                location.href = './index.html';
+            // 防止文章编辑页直接打开了，没有 id 参数，就直接跳转到文章列表页
+            if(!articleId){
+                alert('没有id参数，跳转到文章列表页');
+                // 直接跳转回到文章列表页
+                location.href = './article_list.html';
             }
             console.log('文章编辑页的页面参数', articleId);
             
