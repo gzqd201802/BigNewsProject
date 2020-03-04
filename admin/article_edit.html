@@ -67,6 +67,85 @@
             </form>
         </div>
     </div>
+    <script src="./js/http.js"></script>
+    <!-- 准备下拉项模板 -->
+    <script id="cateOption" type="text/html">
+        {{ each data }}
+        <option value="{{ $value.id }}">{{ $value.name }}</option>
+        {{ /each }}
+    </script>
+    <script>
+        $(function(){
+
+            // 1. 文章编辑页是有文章列表跳转过来的编辑页面
+            // 2. 文章编辑页中需要有文章的id参数
+
+            // 需求1：获取文章 id
+            //   location.search   用于获取页面参数(字符串格式 ?key=value )
+            //   .split('=')       用等号把字符串分隔成数组
+            //   [1]               取出数组索引值为 1 的项
+            const articleId = Number(location.search.split('=')[1]);
+
+            // 防止文章编辑页直接打开了，没有 id 参数，就直接跳转到首页
+            if(articleId === undefined){
+                alert('没有id参数，跳转到首页');
+                // 直接跳转回到首页
+                location.href = './index.html';
+            }
+            console.log('文章编辑页的页面参数', articleId);
+            
+            
+            // 需求2：动态加载文章类别
+            //       1. 把文章类别渲染到下拉框中
+            //       为后面文章详情中的 categoryId 设置文章的类别准备
+            $.ajax({
+                type: "get",
+                url: BigNew.category_list,
+                dataType: "json",
+                success: function (response) {
+                    console.log(response);
+                    if(response.code === 200){
+                        // 调用模板引擎生成 option 列表
+                        const htmlStr = template('cateOption', response);
+                        // 把 option 列表渲染到下拉框中
+                        $('.category').html(htmlStr);
+                    }
+                }
+            });
+
+            // 需求2：根据文章 id 发起请求获取到文章详情数据，并渲染到页面中
+            $.ajax({
+                type: "get",
+                url: BigNew.article_search,
+                data: {
+                    id: articleId
+                },
+                dataType: "json",
+                success: function (response) {
+                    console.log(response);
+                    if(response.code === 200){
+                        // 从返回的总数据中获取到到页面渲染需要的数据
+                        const title = response.data.title;
+                        const cover = response.data.cover;
+                        const date = response.data.date;
+                        const content = response.data.content;
+                        const categoryId = response.data.categoryId;
+                        // 1. 修改标题
+                        $('#inputTitle').val(title);
+                        // 2. 修改图片
+                        $('.article_cover').attr('src', cover);
+                        // 3. 设置文章分类，给 select 下拉框设置一个值即可
+                        //    给 select 下拉框设置值，就会选中 value 值对应的那一项
+                        $('.category').val(categoryId);
+                        
+                    }
+                }
+            });
+
+            
+
+        });
+    </script>
 </body>
 
 </html>

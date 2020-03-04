@@ -247,6 +247,7 @@
                 console.log(id);
                 $.ajax({
                     type: "post",
+                    // 注意这里是 14.删除文章 的接口，不要用错接口
                     url: BigNew.article_delete,
                     data: {
                         id: id
