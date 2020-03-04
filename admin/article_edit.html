@@ -64,8 +64,10 @@
                 <div class="form-group">
                     <label for="inputCover" class="col-sm-2 control-label">文章封面：</label>
                     <div class="col-sm-10">
-                        <img src="images/pic06.jpg" class="article_cover">
-                        <input name="cover" type="file" id="inputCover">
+                        <label for="inputCover">
+                            <img src="images/pic06.jpg" class="article_cover">
+                        </label>
+                        <input name="cover" style="display: none;" type="file" id="inputCover">
                     </div>
                 </div>
                 <div class="form-group">
@@ -83,7 +85,7 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label">发布时间：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" id="myDate">
+                        <input type="text" name="date" class="form-control" id="myDate">
                     </div>
                 </div>
                 <div class="form-group">
@@ -189,22 +191,84 @@
                         // 设置富文本内容 - 传参
                         setTimeout(function(){
                             tinymce.activeEditor.setContent(content);
-                        }, 200);
+                        }, 500);
                     }
                 }
             });
 
-            
+            // 图片本地上传和预览
+            // 当上传按钮的内容发生变化时触发
+            $('#inputCover').change(function(e){
+                // console.dir(this);
+                // 获取到上传的 file 文件
+                const fileImg = this.files[0];
+                // 获取 file 对象在浏览器缓存中的路径
+                const fileUrl = URL.createObjectURL(fileImg);
+                // 把特殊的 url 设置到图片的 src 属性中
+                $('.article_cover').attr('src', fileUrl);
+            });
+
+
+            // 把文章编辑的业务封装成一个函数，提供给 修改 和 存为草稿 两个按钮共同使用
+            //      1. 抽离后是否涉及了局部变量
+            //      2. 抽离后哪些是要能改变的
+            //  封装的两个参数：
+            //      参数 that   接收传过来的点击按钮的地址
+            //      参数 state  接收文章的状态
+            function AjaxArticleEdit(that, state){
+                // 1. 获取富文本编辑器的内容
+                const htmlStr = tinymce.activeEditor.getContent();
+                // console.log(htmlStr);
+                // 把有 name 属性表单自动添加到 FormData 对象中
+                const fd = new FormData(that.form);
+                // id 不在表单中，需要通过 append 主动添加 
+                fd.append('id', articleId);
+                // 富文本需要通过特殊方式获取，所以也需要通过 append 主动添加 
+                fd.append('content', htmlStr);
+                // state 文章的状态也需要主动添加
+                fd.append('state', state);
+
+                // ajax 调用 13 文章编辑接口
+                $.ajax({
+                    type: "post",
+                    url: BigNew.article_edit,
+                    // 注意 fd 本来就是个对象，直接作为参数即可，不要再套上 {} 了
+                    data: fd,
+                    // 禁用 jq 的 post 请求自动添加 content-type 请求头
+                    contentType: false,
+                    // 禁用 jq 自动把参数转换成字符串
+                    processData: false,
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                        if(response.code === 200){
+                            alert('成功');
+                            // 后退回到列表页，因为编辑页面是从列表页跳转过来的。
+                            // history.back(); - 页面不会刷新，有问题
+                            
+                            // 还是用跳转的方式，重新请求到新的数据
+                            location.href = './article_list.html';
+                        }
+                    }
+                });
+            }
+
             // 需求3：点击编辑按钮提交新闻
             //      1. 获取富文本编辑器的内容
             $('.btn-edit').click(function(e){
                 // 阻止默认的表单行为，因为这里是通过 ajax 提交的
                 e.preventDefault();
-                // 1. 获取富文本编辑器的内容
-                const htmlStr = tinymce.activeEditor.getContent();
-                console.log(htmlStr);
+                // 把当前点击按钮局部的 this 传递到另一个函数中，另一个函数用 that 接收
+                AjaxArticleEdit(this, '已发布');
             });
 
+            // 需求4：点击存草稿按钮把新闻的状态变成存草稿
+            $('.btn-draft').click(function(e){
+                // 阻止默认的表单行为，因为这里是通过 ajax 提交的
+                e.preventDefault();
+                // 调用封装好的 ajax 修改文章的请求，只不过这里第二个参数传递的是 '草稿'
+                AjaxArticleEdit(this, '草稿');
+            });
         });
     </script>
 </body>
