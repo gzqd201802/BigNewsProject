@@ -152,7 +152,7 @@
             let state = '';      // 发布状态的下拉框的值
             let key = '';                           // 搜索关键词，可以为空
             let page = 1;                           // 当前页，为空返回第1页
-            let perpage = 10;                       // 每页显示条数
+            let perpage = 2;                        // 每页显示条数
 
             $('#btnSearch').click(function(e){
                 // 默认行为影响到了请求，就把默认行为干掉
@@ -222,7 +222,7 @@
                     next:'下一页',
                     last:'尾页',
                     // 当页码点击时候触发的回调函数
-                    // 注意事项：分页器会自动帮我们触发一下 startPage 当前页
+                    // 注意事项：分页器会自动帮我们触发一下 currentPage 当前页
                     onPageClick: function (event, currentPage) {
                         console.log('currentPage', currentPage);
                         // 把当前点击的页数，赋值给公共的 page 变量中，作为新的 ajax 请求参数
@@ -236,6 +236,38 @@
                 });
             }
 
+
+            // 目标：实现删除按钮的业务
+            //     注意事项：
+            //          1. 按钮身上没有 data-id 自定义属性(作为删除的参数)
+            //          2. 删除按钮是动态生成的，需要通过事件委托实现事件绑定
+            //          3. 删除成功后，需要重新请求文章列表数据和渲染
+            $('tbody').on('click','.delete',function(){
+                const id = $(this).attr('data-id');
+                console.log(id);
+                $.ajax({
+                    type: "post",
+                    url: BigNew.article_delete,
+                    data: {
+                        id: id
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        // 回来的数据一定要先打印
+                        // console.log(response);
+                        // 如果删除成功，删除成功的 code 是 204
+                        if(response.code === 204){
+                            // 如果 tr 只剩下一条的情况要特殊处理，删除成功要回到上一页
+                            if($('tbody tr').length === 1){
+                                // 把全局的 page 数据减少 1
+                                page -= 1;
+                            }
+                            // 重新发起 ajax 请求并渲染文章列表
+                            ajaxGetList();
+                        }
+                    }
+                });
+            });
         });
     </script>
 </body>
